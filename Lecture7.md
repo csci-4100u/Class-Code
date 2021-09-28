@@ -1,4 +1,4 @@
-# Stateful Widgetes and Forms in Flutter
+# Stateful Widget and Forms in Flutter
 
 **1. Stateful Widget**  
 If a widget can change—when a user interacts with it, for example—it’s stateful. A stateful widget is dynamic: for example, it can change its appearance in response to events triggered by user interactions or when it receives data. Some examples are:
