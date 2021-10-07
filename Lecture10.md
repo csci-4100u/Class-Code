@@ -44,7 +44,7 @@ class ContentArea extends StatelessWidget {
 	   );
 }
 
-	_showDialog(BuildContext context) {
+	_showDialog(BuildContext context) { 
 	   return showDialog(
 	       context: context,
 	       builder: (BuildContext context) => AlertDialog(
@@ -62,68 +62,110 @@ class ContentArea extends StatelessWidget {
 	}
 
 ```
-**3. Floating Action Button**  
-A Floating Action Button can be used to add a button to the screen.
-The code below will be added either at the bottom of the above written code or as a separate file. The object of this class is then provided to `floatingActionButton` property of the Scaffold.
+**3.Notifications**  
+Flutter does not support native notifications. A package can be used for this purpose. Add the following line to `pubspec.yaml`:   
+`flutter_local_notifications:`  
+A separate class is created for this notification
 
 ```
-class MyFloatingButton extends StatelessWidget {
-  Widget build(BuildContext context) {
-    return FloatingActionButton(
-        child: Icon(Icons.shopping_cart_outlined), onPressed: () {});
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+	import 'package:flutter/material.dart';
+
+	class SimpleNotification {
+	  BuildContext context;
+	  late FlutterLocalNotificationsPlugin notification;
+
+	  SimpleNotification(this.context) {
+	    initNotification();
+	  }
+
+	  //initialize notification
+	  initNotification() {
+	    notification = FlutterLocalNotificationsPlugin();
+	    AndroidInitializationSettings androidInitializationSettings =
+	        AndroidInitializationSettings('@mipmap/ic_launcher');
+	    IOSInitializationSettings iOSInitializationSettings =
+	        IOSInitializationSettings();
+
+	    InitializationSettings initializationSettings = InitializationSettings(
+	        android: androidInitializationSettings, iOS: iOSInitializationSettings);
+
+	    notification.initialize(initializationSettings,
+	        onSelectNotification: selectNotification);
+	  }
+
+	  Future<String?> selectNotification(String? payload) async {
+	    await showDialog(
+	        context: context,
+	        builder: (BuildContext context) => AlertDialog(
+	              title: Text("Notification Clicked"),
+	              content: Text("You clicked the notification."),
+	            ));
+	  }
+
+	  Future showNotification() async {
+	    var android = AndroidNotificationDetails(
+	        "channelId", "channelName", "This is a simple notification",
+	        priority: Priority.high, importance: Importance.max);
+	    var platformDetails = NotificationDetails(android: android);
+	    await notification.show(100, "Simple Notification",
+	        "This is a simple notification", platformDetails,
+	        payload: "a demo payload");
 	  }
 	}
+```
+Below is the ScaffoldBodyContent class:
 
 ```
-
-**4. BottomNavigationBar**  
-BottomNavigationBar is used for tapped bars at the bottom.
-The code below will be added either at the bottom of the above written code or as a separate file. The object of this class is then provided to `bottomNavigationBar` property of the Scaffold.
-
-```
-class MyBottomNavigationBar extends StatefulWidget {
-	  @override
-	  _MyBottomNavigationBarState createState() => _MyBottomNavigationBarState();
-	}
-
-	class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
-	  int _currentIndex = 0;
-
+class ScaffoldBodyContent extends StatelessWidget {
 	  @override
 	  Widget build(BuildContext context) {
-	    return BottomNavigationBar(
-	      items: [
-	        BottomNavigationBarItem(icon: Icon(Icons.list), label: "My List"),
-	        BottomNavigationBarItem(
-	            icon: Icon(Icons.account_balance), label: "My Account"),
-	      ],
-	      currentIndex: _currentIndex,
-	      onTap: (int index) {
-	        setState(() {
-	          _currentIndex = index;
-	        });
+	    return Center(
+	        child: ElevatedButton(
+	      onPressed: () {
+	        SimpleNotification(context).showNotification();
 	      },
-	    );
+	      child: Text("Simple Notification"),
+	    ));
 	  }
 	}
-
 ```
 
-**5. Drawer**  
-Drawers are used for Sliding Menu from left.
-The code below will be added either at the bottom of the above written code or as a separate file. The object of this class is then provided to `drawer` property of the Scaffold.
+**4.Scheduled Notifications**   
+We did not get a chance to do this scheduled notification in class, but here it is for you to try.  
+
+In order to schedule notifications, add following line to manifest file in android
 
 ```
-class MyDrawer extends StatelessWidget {
-	  @override
-	  Widget build(BuildContext context) {
-	    return Drawer(
-	      child: Column(
-	        mainAxisAlignment: MainAxisAlignment.start,
-	        crossAxisAlignment: CrossAxisAlignment.start,
-	        children: []
-		));
-	}
-	}
+<receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+```
 
+Add following two packages
+```
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+```	
+Initialize the timezone
+```
+tz.initializeTimeZones();
+```
+Finally add the following function to above class
+
+```
+Future showScheduledNotification() async {
+	    var android = AndroidNotificationDetails(
+	        "channelId", "channelName", "This is a simple notification",
+	        priority: Priority.high, importance: Importance.max);
+	    var platformDetails = NotificationDetails(android: android);
+	    await notification.zonedSchedule(
+	        101,
+	        "Scheduled Notification",
+	        "This is a sample scheduled notification",
+	        tz.TZDateTime.from(DateTime.now(), tz.local)
+	            .add(const Duration(seconds: 5)),
+	        platformDetails,
+	        uiLocalNotificationDateInterpretation:
+	            UILocalNotificationDateInterpretation.absoluteTime,
+	        androidAllowWhileIdle: true);
+	  }
 ```
