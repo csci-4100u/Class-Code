@@ -51,10 +51,10 @@ class ScaffoldBodyContent extends StatelessWidget {
       layers: [
         TileLayerOptions(
             urlTemplate:
-                "https://api.mapbox.com/styles/v1/raziiqbal/ckw122laq0svr14qtkbxgh5p9/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmF6aWlxYmFsIiwiYSI6ImNrdzEyMDhpZjFzZ2oydW9sYXh1M3VzbzYifQ.BLuY-IJRDpCw99gsuZi9Ag",
+                "MAPBOX_URL_HERE",
             additionalOptions: {
               'accessToken':
-                  'pk.eyJ1IjoicmF6aWlxYmFsIiwiYSI6ImNrdzEyMDhpZjFzZ2oydW9sYXh1M3VzbzYifQ.BLuY-IJRDpCw99gsuZi9Ag',
+                  'ACCESS_TOKEN_HERE',
               'id': 'mapbox.mapbox-streets-v8'
             }),
         MarkerLayerOptions(markers: [
