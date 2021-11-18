@@ -18,7 +18,6 @@ import 'package:latlong2/latlong.dart';
 void main() {
   runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
